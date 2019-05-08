@@ -48,7 +48,7 @@ module Devise
           end
 
           # extra validations
-          validates :email, email: email_validation if email_validation # use rails_email_validator or similar
+          validates :email, email: email_validation if email_validation # see https://github.com/devise-security/devise-security/blob/master/README.md#e-mail-validation
           validates :password,
                     'devise_security/password_complexity': password_complexity,
                     if: :password_required?
@@ -90,8 +90,8 @@ module Devise
 
         def has_uniqueness_validation_of_login?
           validators.any? do |validator|
-            validator.kind_of?(ActiveRecord::Validations::UniquenessValidator) &&
-              validator.attributes.include?(login_attribute)
+            validator_orm_klass = DEVISE_ORM == :active_record ? ActiveRecord::Validations::UniquenessValidator : ::Mongoid::Validatable::UniquenessValidator
+            validator.kind_of?(validator_orm_klass) && validator.attributes.include?(login_attribute)
           end
         end
 

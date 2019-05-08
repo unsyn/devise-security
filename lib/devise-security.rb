@@ -1,14 +1,16 @@
 # frozen_string_literal: true
+DEVISE_ORM = ENV.fetch('DEVISE_ORM', 'active_record').to_sym unless defined?(DEVISE_ORM)
 
-require 'active_record'
+require DEVISE_ORM.to_s if DEVISE_ORM.in? [:active_record, :mongoid]
 require 'active_support/core_ext/integer'
 require 'active_support/ordered_hash'
 require 'active_support/concern'
 require 'devise'
 
 module Devise
-
-  # Should the password expire (e.g 3.months)
+  # Number of seconds that passwords are valid (e.g 3.months)
+  # Disable pasword expiration with +false+
+  # Expire only on demand with +true+
   mattr_accessor :expire_password_after
   @@expire_password_after = 3.months
 
@@ -25,7 +27,7 @@ module Devise
   @@deny_old_passwords = true
 
   # enable email validation for :secure_validatable. (true, false, validation_options)
-  # dependency: need an email validator like rails_email_validator
+  # dependency: need an email validator, see https://github.com/devise-security/devise-security/blob/master/README.md#e-mail-validation
   mattr_accessor :email_validation
   @@email_validation = true
 
@@ -102,7 +104,6 @@ Devise.add_module :paranoid_verification, controller: :paranoid_verification_cod
 # requires
 require 'devise-security/routes'
 require 'devise-security/rails'
-require 'devise-security/orm/active_record'
-require 'devise-security/models/old_password'
+require "devise-security/orm/#{DEVISE_ORM}"
 require 'devise-security/models/database_authenticatable_patch'
 require 'devise-security/models/paranoid_verification'
