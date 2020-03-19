@@ -11,6 +11,7 @@ module DeviseSecurity::Patches
     private
 
     def check_captcha
+      Rails.logger.info("#{Time.now}: check_captcha in EasyCaptcha. session[:captcha].to_s.upcase: #{session[:captcha].to_s.upcase} and params[:captcha].to_s: #{params[:captcha].to_s}.")
       return if valid_captcha_if_defined?(params[:captcha])
 
       flash[:alert] = t('devise.invalid_captcha') if is_navigational_format?
